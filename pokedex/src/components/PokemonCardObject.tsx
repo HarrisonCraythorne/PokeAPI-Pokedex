@@ -42,19 +42,20 @@ const PokemonCardObject = (props: IProps) => {
     return (
         <Card sx={{width: '280px', display: 'flex' }}>
             <CardActionArea  onClick={goToPokemon} >
-                <Stack direction='row' spacing={-3}>
+                <Stack direction='row' spacing={-3} alignItems='center'>
                     <CardMedia
                         component='img'
                         image={pokemon.sprites.front_default !== null ? pokemon.sprites.front_default : undefined}
                         alt={`${pokemon.name} image`}
                         sx={{
-                            width: '96px',
+                            width: '120px',
+                            height: '120px',
                             overflow: 'hidden',
                         }}
                     />
                     <CardContent>
                         <Box display='flex' justifyContent='center'>
-                            <Typography variant='h5'>
+                            <Typography variant='h5' noWrap>
                                 {toTitleCase(pokemon.name)}&nbsp;
                             </Typography>
                             <Typography> </Typography>
