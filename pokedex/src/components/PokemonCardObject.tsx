@@ -42,11 +42,11 @@ const PokemonCardObject = (props: IProps) => {
     return (
         <Card sx={{width: '280px', display: 'flex' }}>
             <CardActionArea  onClick={goToPokemon} >
-                <Stack direction='row' spacing={-3} alignItems='center'>
+                <Stack direction='row' spacing={-4} alignItems='center'>
                     <CardMedia
                         component='img'
                         image={pokemon.sprites.front_default !== null ? pokemon.sprites.front_default : undefined}
-                        alt={`${pokemon.name} image`}
+                        alt={`Loading ${pokemon.name} image...`}
                         sx={{
                             width: '120px',
                             height: '120px',
@@ -64,7 +64,9 @@ const PokemonCardObject = (props: IProps) => {
                             </Typography>
                         </Box>
                         <TypeChip pokemonType={pokemon.types.at(0)} />
-                        <TypeChip pokemonType={pokemon.types.at(1)} />
+                        {// ensures only pokemon with two types have two type chips present
+                         // can be removed to always show two chips and have a blank second chips for monotype pokemon
+                            pokemon.types.at(1) && <TypeChip pokemonType={pokemon.types.at(1)} />}
                         <Typography variant='body2' sx={{ color: 'text.secondary', mt: 1}}>
                             {`Height: ${decimetresToHeightString(pokemon.height)}`}
                         </Typography>
