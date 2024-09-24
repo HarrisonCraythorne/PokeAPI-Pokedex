@@ -18,6 +18,7 @@ import DarkChip from "./DarkChip";
 import SteelChip from "./SteelChip";
 import EmptyChip from "./EmptyChip";
 import {PokemonType} from "pokenode-ts";
+import FairyChip from "./FairyChip";
 
 interface ITypeChipProps {
     pokemonType: PokemonType | undefined;
@@ -29,40 +30,42 @@ const TypeChip = (props: ITypeChipProps) => {
 
     function chipFromType(type: string): any {
         switch (type.toLowerCase()) {
-            case 'normal':
-                return <NormalChip/>;
-            case 'fire':
-                return <FireChip/>;
-            case 'water':
-                return <WaterChip/>;
-            case 'electric':
-                return <ElectricChip/>;
-            case 'grass':
-                return <GrassChip/>;
-            case 'ice':
-                return <IceChip/>;
-            case 'fighting':
-                return <FightingChip/>;
-            case 'poison':
-                return <PoisonChip/>;
-            case 'ground':
-                return <GroundChip/>;
-            case 'flying':
-                return <FlyingChip/>;
-            case 'psychic':
-                return <PsychicChip/>;
             case 'bug':
                 return <BugChip/>;
-            case 'rock':
-                return <RockChip/>;
-            case 'ghost':
-                return <GhostChip/>;
-            case 'dragon':
-                return <DragonChip/>;
             case 'dark':
                 return <DarkChip/>;
+            case 'dragon':
+                return <DragonChip/>;
+            case 'electric':
+                return <ElectricChip/>;
+            case 'fairy':
+                return <FairyChip/>;
+            case 'fighting':
+                return <FightingChip/>;
+            case 'fire':
+                return <FireChip/>;
+            case 'flying':
+                return <FlyingChip/>;
+            case 'ghost':
+                return <GhostChip/>;
+            case 'grass':
+                return <GrassChip/>;
+            case 'ground':
+                return <GroundChip/>;
+            case 'ice':
+                return <IceChip/>;
+            case 'normal':
+                return <NormalChip/>;
+            case 'poison':
+                return <PoisonChip/>;
+            case 'psychic':
+                return <PsychicChip/>;
+            case 'rock':
+                return <RockChip/>;
             case 'steel':
                 return <SteelChip/>;
+            case 'water':
+                return <WaterChip/>;
             default:
                 return <EmptyChip/>;
         }
