@@ -1,10 +1,14 @@
 /**
  * Turns input string into title cased string (where each word's first letter is a capital)
+ * Considers words text split by a space (' ') or a hyphen ('-')
  */
 function toTitleCase(str: string): string {
     return str.split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+        .join(' ')
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join('-');
 }
 
 /**
