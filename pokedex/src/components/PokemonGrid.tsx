@@ -37,6 +37,8 @@ const PokemonGrid = () => {
                 // Wait for all the promises to resolve
                 const responses = await Promise.all(promises);
                 setPokemon(responses);
+                setErrorFlag(false);
+                setErrorMessage('');
             } catch (error: any) {
                 setErrorFlag(true);
                 setErrorMessage(error.toString());
