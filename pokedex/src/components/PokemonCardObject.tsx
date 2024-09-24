@@ -1,65 +1,78 @@
 import React from 'react';
 import {
-    Avatar,
     Box,
-    Card, CardActionArea,
-    CardContent, CardHeader,
+    Card,
+    CardActionArea,
+    CardContent,
     CardMedia,
+    Stack,
     Typography,
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
 import {Pokemon} from 'pokenode-ts';
+import {decimetresToHeightString, hectogramsToWeightString, toPokemonNumber, toTitleCase} from '../utils';
+import TypeChip from './type_chips/TypeChip';
 
+/**
+ * Pokemon prop to pass through, using type as defined by pokenode-ts (https://pokenode-ts.vercel.app/)
+ */
 interface IProps {
     pokemon: Pokemon | undefined;
 }
 
+/**
+ * Pokemon card to be displayed in general pokemon grid
+ * @param props Pokemon whose data will be displayed
+ */
 const PokemonCardObject = (props: IProps) => {
     const navigate = useNavigate();
     const pokemon = props.pokemon;
 
-    if (pokemon == undefined) {
-        return <>"loading..."</>;
+    if (pokemon === undefined) {
+        return <>loading...</>;
     }
 
-    const goToPetition = () => {
+    /**
+     * Navigate to detailed pokemon page
+     */
+    const goToPokemon = () => {
         navigate(`/pokemon/${pokemon.id}`);
     };
 
     return (
-        <Card sx={{maxWidth: 550}}>
-            <CardActionArea onClick={goToPetition} sx={{'&:hover': {backgroundColor: 'rgba(0, 0, 0, 0.1)'},}}>
-                <CardMedia
-                    component="img"
-                    sx={{ width: 151 }}
-                    image={pokemon.sprites.front_default !== null ? pokemon.sprites.front_default : undefined}
-                    alt={`${pokemon.name} image`}
-                />
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ flex: '1 0 auto' }}>
-                        <Typography component="div" variant="h5">
-                            Live From Space
+        <Card sx={{width: '280px', display: 'flex' }}>
+            <CardActionArea  onClick={goToPokemon} >
+                <Stack direction='row' spacing={-3}>
+                    <CardMedia
+                        component='img'
+                        image={pokemon.sprites.front_default !== null ? pokemon.sprites.front_default : undefined}
+                        alt={`${pokemon.name} image`}
+                        sx={{
+                            width: '96px',
+                            overflow: 'hidden',
+                        }}
+                    />
+                    <CardContent>
+                        <Box display='flex' justifyContent='center'>
+                            <Typography variant='h5'>
+                                {toTitleCase(pokemon.name)}&nbsp;
+                            </Typography>
+                            <Typography> </Typography>
+                            <Typography variant='h5' sx={{ color: 'text.secondary' }}>
+                                {toPokemonNumber(pokemon.id)}
+                            </Typography>
+                        </Box>
+                        <TypeChip pokemonType={pokemon.types.at(0)} />
+                        <TypeChip pokemonType={pokemon.types.at(1)} />
+                        <Typography variant='body2' sx={{ color: 'text.secondary', mt: 1}}>
+                            {`Height: ${decimetresToHeightString(pokemon.height)}`}
                         </Typography>
-                        <Typography
-                            variant="subtitle1"
-                            component="div"
-                            sx={{ color: 'text.secondary' }}
-                        >
-                            Mac Miller
+                        <Typography> </Typography>
+                        <Typography variant='body2' sx={{ color: 'text.secondary' }}>
+                            {`Weight: ${hectogramsToWeightString(pokemon.weight)}`}
                         </Typography>
                     </CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-                        <IconButton aria-label="previous">
-                            {theme.direction === 'rtl' ? <SkipNextIcon /> : <SkipPreviousIcon />}
-                        </IconButton>
-                        <IconButton aria-label="play/pause">
-                            <PlayArrowIcon sx={{ height: 38, width: 38 }} />
-                        </IconButton>
-                        <IconButton aria-label="next">
-                            {theme.direction === 'rtl' ? <SkipPreviousIcon /> : <SkipNextIcon />}
-                        </IconButton>
-                    </Box>
-                </Box>
+                </Stack>
             </CardActionArea>
         </Card>
     );
