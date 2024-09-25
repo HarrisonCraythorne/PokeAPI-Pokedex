@@ -8,35 +8,41 @@ import {POKE_ID_RANGE} from "../constants/constants";
 
 const PokemonGrid = () => {
 
+    // Error stats if PokeAPI call fails
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
 
+    // Info about pokemon list, and page data.
     const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
+    const [currentPagePokemon, setCurrentPagePokemon] = React.useState<Array<Pokemon>>([]);
     const [pageNum, setPageNum] = React.useState(1);
     const [pageSize, setPageSize] = React.useState<number>(35);
-    const cardsPerPageOptions = [5, 10, 20, 35, 50];
+    // Options for number of pokemon per page
+    const cardsPerPageOptions = [5, 10, 20, 35, 50, POKE_ID_RANGE.MAX];
 
 
     /**
-     * Get the pokemon data from PokeAPI to populate the pokemon card grid
-     * Utilising lazy loading, so only fetches pokemon that will show up on the current page
+     * Get the pokemon data from PokeAPI to populate the pokemon card grid. Grabs all pokemon and then gets the subset
+     * of pokemon that would show up on the current page.
+     * (Initially tried only getting pokemon on the current page, this was a bit faster initially but required
+     *  loading times every page swap which was irritating. This is slightly slow initially and faster otherwise.)
      */
     React.useEffect(() => {
         const getPokemon = async () => {
             const api = new PokemonClient();
 
             try {
-                const promises: Array<Promise<Pokemon>> = [];
-                // to ensure no strange errors if a page below 1 is somehow obtained
-                const minIndexToFetch = Math.max(((pageNum - 1) * pageSize) + 1, POKE_ID_RANGE.MIN)
-                const maxIndexToFetch = Math.min(pageNum * pageSize, POKE_ID_RANGE.MAX)
-                for (let i = minIndexToFetch; i <= maxIndexToFetch; i++) {
-                    promises.push(api.getPokemonById(i));
+                if (pokemon.length < POKE_ID_RANGE.MAX) {
+                    const promises: Array<Promise<Pokemon>> = [];
+                    for (let i = POKE_ID_RANGE.MIN; i <= POKE_ID_RANGE.MAX; i++) {
+                        promises.push(api.getPokemonById(i));
+                    }
+                    // Wait for all the promises to resolve
+                    const responses = await Promise.all(promises);
+                    setPokemon(responses);
                 }
-
-                // Wait for all the promises to resolve
-                const responses = await Promise.all(promises);
-                setPokemon(responses);
+                const pagePokemon: Array<Pokemon> = pokemon.slice(((pageNum - 1) * pageSize), pageNum * pageSize);
+                setCurrentPagePokemon(pagePokemon);
                 setErrorFlag(false);
                 setErrorMessage('');
             } catch (error: any) {
@@ -45,7 +51,7 @@ const PokemonGrid = () => {
             }
         };
         getPokemon();
-    }, [pageNum, pageSize]);
+    }, [pageNum, pageSize, pokemon]);
 
     /**
      * Function that maps pokemon objects into pokemon cards to display in the grid
@@ -73,7 +79,7 @@ const PokemonGrid = () => {
             )
         } else {
             return (
-                pokemon.map((pokemon: Pokemon) =>
+                currentPagePokemon.map((pokemon: Pokemon) =>
                     <Grid sx={{display: "flex", justifyContent: "center"}}>
                         <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", minWidth: "100%"}}>
                             <PokemonCardObject key={pokemon.id} pokemon={pokemon}/>
