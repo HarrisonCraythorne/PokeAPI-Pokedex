@@ -181,7 +181,7 @@ const PokemonDetailedView = () => {
                         }}
                     />
                     <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-evenly' sx={{width: '90%'}}>
-                        <Stack spacing={0} sx={{width: '200px'}}>
+                        <Stack spacing={0} sx={{width: '250px'}}>
                             <Box display='flex' justifyContent='space-between'>
                                 <Typography variant='h6' sx={{color: 'text.secondary'}}>
                                     Abilities:&nbsp;
