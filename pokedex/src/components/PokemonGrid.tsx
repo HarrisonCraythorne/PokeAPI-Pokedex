@@ -5,53 +5,40 @@ import Grid from "@mui/material/Unstable_Grid2";
 import {Pokemon, PokemonClient} from "pokenode-ts";
 import PokemonCardObject from "./PokemonCardObject";
 import {POKE_ID_RANGE} from "../constants/constants";
+import {useNavigate, useParams} from "react-router-dom";
 
-const PokemonGrid = () => {
+interface PokemonGridProps {
+    pokemon: Pokemon[];
+}
+
+const PokemonGrid = (props: PokemonGridProps) => {
+
+    const navigate = useNavigate();
 
     // Error stats if PokeAPI call fails
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState("");
 
     // Info about pokemon list, and page data.
-    const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
+    //const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
     const [currentPagePokemon, setCurrentPagePokemon] = React.useState<Array<Pokemon>>([]);
-    const [pageNum, setPageNum] = React.useState(1);
+    //const [pageNum, setPageNum] = React.useState(1);
     const [pageSize, setPageSize] = React.useState<number>(35);
     // Options for number of pokemon per page
     const cardsPerPageOptions = [5, 10, 20, 35, 50, POKE_ID_RANGE.MAX];
+    const pokemon = props.pokemon;
+    const pageNum = parseInt(useParams().pageNum || '1');
 
 
-    /**
-     * Get the pokemon data from PokeAPI to populate the pokemon card grid. Grabs all pokemon and then gets the subset
-     * of pokemon that would show up on the current page.
-     * (Initially tried only getting pokemon on the current page, this was a bit faster initially but required
-     *  loading times every page swap which was irritating. This is slightly slow initially and faster otherwise.)
-     */
     React.useEffect(() => {
-        const getPokemon = async () => {
-            const api = new PokemonClient();
-
-            try {
-                if (pokemon.length < POKE_ID_RANGE.MAX) {
-                    const promises: Array<Promise<Pokemon>> = [];
-                    for (let i = POKE_ID_RANGE.MIN; i <= POKE_ID_RANGE.MAX; i++) {
-                        promises.push(api.getPokemonById(i));
-                    }
-                    // Wait for all the promises to resolve
-                    const responses = await Promise.all(promises);
-                    setPokemon(responses);
-                }
-                const pagePokemon: Array<Pokemon> = pokemon.slice(((pageNum - 1) * pageSize), pageNum * pageSize);
-                setCurrentPagePokemon(pagePokemon);
-                setErrorFlag(false);
-                setErrorMessage('');
-            } catch (error: any) {
-                setErrorFlag(true);
-                setErrorMessage(error.toString());
-            }
+        const getPokemon = () => {
+            const pagePokemon: Array<Pokemon> = pokemon.slice(((pageNum - 1) * pageSize), pageNum * pageSize);
+            setCurrentPagePokemon(pagePokemon);
+            setErrorFlag(false);
+            setErrorMessage('');
         };
         getPokemon();
-    }, [pageNum, pageSize, pokemon]);
+    }, [pokemon, pageNum, pageSize]);
 
     /**
      * Function that maps pokemon objects into pokemon cards to display in the grid
@@ -104,7 +91,7 @@ const PokemonGrid = () => {
      * @param newPage The new page number to switch to. This param is automatically passed to this method by react.
      */
     const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
-        setPageNum(newPage);
+        navigate(`/pokedex/${newPage}`);
     };
 
 
@@ -114,10 +101,8 @@ const PokemonGrid = () => {
      * if new page size is 10 (items 11-20). Due to rounding this may not always be entirely accurate.
      */
     const handleChangePageSize = (event: { target: { value: string; }; }) => {
-        const oldRowsPerPage = pageSize;
         const newRowsPerPage = parseInt(event.target.value, 10)
         setPageSize(newRowsPerPage);
-        setPageNum(Math.ceil(((pageNum * oldRowsPerPage) - (oldRowsPerPage - 1)) / newRowsPerPage));
     };
 
 
