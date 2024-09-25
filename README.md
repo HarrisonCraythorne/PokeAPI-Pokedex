@@ -15,4 +15,4 @@ be redirected to http://localhost:3000. If you are not, simply click the link.
 [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)\
 [React documentation](https://reactjs.org/)\
 [MUI Documentation](https://mui.com/)\
-[Pokenode Documentation]((https://pokenode-ts.vercel.app/))
+[Pokenode Documentation](https://pokenode-ts.vercel.app/)
