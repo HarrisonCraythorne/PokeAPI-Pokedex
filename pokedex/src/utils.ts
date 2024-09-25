@@ -1,4 +1,4 @@
-import {PokemonAbility} from "pokenode-ts";
+import {PokemonAbility, PokemonClient, PokemonType} from "pokenode-ts";
 
 /**
  * Turns input string into title cased string (where each word's first letter is a capital)
@@ -73,10 +73,51 @@ function getPokemonHiddenAbilityString(abilities: PokemonAbility[]): string {
     return "None"
 }
 
+async function getPokemonWeakness(types: PokemonType[]): Promise<string[]> {
+    const api = new PokemonClient();
+    try {
+        let resist: string[] = [];
+        let weak: string[] = [];
+        let immune: string[] = [];
+
+        await Promise.all(types.map(async (type: PokemonType) => {
+            const typeResponse = await api.getTypeByName(type.type.name);
+
+            if (typeResponse && typeResponse.damage_relations) {
+                // Push values to immune
+                typeResponse.damage_relations.no_damage_from.forEach((item: { name: string }) => {
+                    immune.push(item.name);
+                });
+
+                // Push values to resist
+                typeResponse.damage_relations.half_damage_from.forEach((item: { name: string }) => {
+                    resist.push(item.name);
+                });
+
+                // Push values to weak
+                typeResponse.damage_relations.double_damage_from.forEach((item: { name: string }) => {
+                    weak.push(item.name);
+                });
+            }
+        }));
+
+        // Create a Set to filter out duplicates
+        return Array.from(new Set(
+            weak.filter((type: string) => {
+                return !resist.includes(type) && !immune.includes(type);
+            })
+        ));
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
 export {
     toTitleCase,
     toPokemonNumber,
     decimetresToHeightString,
     hectogramsToWeightString,
     getPokemonAbilitiesString,
-    getPokemonHiddenAbilityString};
+    getPokemonHiddenAbilityString,
+    getPokemonWeakness};
