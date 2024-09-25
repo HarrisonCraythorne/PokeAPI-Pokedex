@@ -70,6 +70,9 @@ const PokemonDetailedView = () => {
     }
 
 
+    /**
+     * If invalid id, returns NotFound page, else displays a loading screen while api call is made
+     */
     if (!id || id < POKE_ID_RANGE.MIN || id > POKE_ID_RANGE.MAX) {
         return (<NotFound/>)
     } else if (!pokemon) {
@@ -80,6 +83,9 @@ const PokemonDetailedView = () => {
         );
     }
 
+    /**
+     * Gets the type chips of all the weakness types of the pokemon. If none returns an empty chip
+     */
     function getWeaknessChips() {
         if (weaknesses.length === 0) {
             return (
@@ -96,6 +102,9 @@ const PokemonDetailedView = () => {
         }
     }
 
+    /**
+     * Gets the type chips of all the resisted types of the pokemon. If none returns an empty chip
+     */
     function getResistChips() {
         if (resistances.length === 0) {
             return (
@@ -112,6 +121,10 @@ const PokemonDetailedView = () => {
         }
     }
 
+    /**
+     * Gets the type chips of all the immune types of the pokemon. If none this whole section is not rendered in the
+     * component return statement, so no need for empty chips here
+     */
     function getImmuneChips() {
         return (
             immunities.map((type: string, index: number) =>
@@ -203,6 +216,8 @@ const PokemonDetailedView = () => {
                             </Box>
                         </Stack>
                         <Stack spacing={0} sx={{width: '200px'}}>
+                            {/*Titles for stats are hard coded, as these will not change and some names I don't prefer
+                               e.g. I prefer Health over HP, but PokeAPI uses HP*/}
                             <Typography variant='h6'>
                                 Stats:
                             </Typography>
