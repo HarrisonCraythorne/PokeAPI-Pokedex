@@ -21,9 +21,10 @@ import NotFound from './NotFound';
 import CSS from 'csstype';
 import BackButton from './BackButton';
 import EmptyChip from "./type_chips/EmptyChip";
+import {POKE_ID_RANGE} from "../constants/constants";
 
 const PokemonDetailedView = () => {
-    const id = useParams().pokemonId;
+    const id = parseInt(useParams().pokemonId || '0', 10);
     const [errorFlag, setErrorFlag] = React.useState(false);
     const [errorMessage, setErrorMessage] = React.useState('');
     const [pokemon, setPokemon] = React.useState<Pokemon | null>(null);
@@ -37,17 +38,15 @@ const PokemonDetailedView = () => {
      */
     React.useEffect(() => {
         const getPokemon = async () => {
-            if (id) {
+            if (id && id > 0) {
                 const api = new PokemonClient();
 
                 try {
-                    const pokemonId = parseInt(id, 10);
-                    const pokemon: Pokemon = await api.getPokemonById(pokemonId);
+                    const pokemon: Pokemon = await api.getPokemonById(id);
                     setPokemon(pokemon);
                     setErrorFlag(false);
                     setErrorMessage('');
                     const damageRelations: DamageRelations = await getPokemonDamageRelations(pokemon.types)
-                    console.log(damageRelations)
                     setWeaknesses(damageRelations.weaknesses);
                     setResistances(damageRelations.resistances);
                     setImmunities(damageRelations.immunities);
@@ -70,8 +69,15 @@ const PokemonDetailedView = () => {
         width: 'auto'
     }
 
-    if (!id || !pokemon) {
+
+    if (!id || id < POKE_ID_RANGE.MIN || id > POKE_ID_RANGE.MAX) {
         return (<NotFound/>)
+    } else if (!pokemon) {
+        return(
+            <Typography variant='h2'>
+                Loading...
+            </Typography>
+        );
     }
 
     function getWeaknessChips() {
