@@ -1,14 +1,14 @@
+import {PokemonAbility} from "pokenode-ts";
+
 /**
  * Turns input string into title cased string (where each word's first letter is a capital)
- * Considers words text split by a space (' ') or a hyphen ('-')
+ * Removes all hyphens from the string and replaces them with spaces first
  */
 function toTitleCase(str: string): string {
-    return str.split(' ')
+    return str.replace(/-/g, ' ')
+        .split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ')
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join('-');
 }
 
 /**
@@ -37,4 +37,46 @@ function hectogramsToWeightString(hectograms: number): string {
     return metres + "kg";
 }
 
-export {toTitleCase, toPokemonNumber, decimetresToHeightString, hectogramsToWeightString};
+/**
+ * Returns a string detailing either the pokemons first ability (if pokemon only has one) or the first and second
+ * ability seperated by a slash (if pokemon has two). Title cases the pokemon abilities before returning them.
+ * Does not return any pokemon hidden abilities
+ * @param abilities list of PokemonAbility types in the pokemon's data
+ */
+function getPokemonAbilitiesString(abilities: PokemonAbility[]): string {
+    // should always have a first ability
+    const firstAbility: string = abilities.at(0)?.ability.name || '';
+    // optionally have a second normal ability. Is not included here if it is a hidden ability
+    let secondAbility: string | undefined;
+    if (abilities.length > 1 && !abilities.at(1)?.is_hidden) {
+        secondAbility = abilities.at(1)?.ability.name;
+    }
+    return (secondAbility ?
+        "Abilities: " + toTitleCase(firstAbility) + '/' + toTitleCase(secondAbility) :
+        "Ability: " + toTitleCase(firstAbility));
+}
+
+
+/**
+ * Returns a string detailing the pokemons hidden ability if present.
+ * If no hidden ability saying 'None' as hidden ability
+ * Title cases ability before returning it
+ * @param abilities list of PokemonAbility types in the pokemon's data
+ */
+function getPokemonHiddenAbilityString(abilities: PokemonAbility[]): string {
+    for (let i = 0; i < abilities.length; i++) {
+        if (abilities.at(i)?.is_hidden) {
+            const hiddenAbility: string = abilities.at(i)?.ability.name || '';
+            return "Hidden Ability: " + toTitleCase(hiddenAbility);
+        }
+    }
+    return "Hidden Ability: None"
+}
+
+export {
+    toTitleCase,
+    toPokemonNumber,
+    decimetresToHeightString,
+    hectogramsToWeightString,
+    getPokemonAbilitiesString,
+    getPokemonHiddenAbilityString};
