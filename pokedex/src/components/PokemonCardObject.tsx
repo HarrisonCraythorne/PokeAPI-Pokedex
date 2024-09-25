@@ -58,7 +58,6 @@ const PokemonCardObject = (props: IProps) => {
                             <Typography variant='h5' noWrap>
                                 {toTitleCase(pokemon.name)}&nbsp;
                             </Typography>
-                            <Typography> </Typography>
                             <Typography variant='h5' sx={{ color: 'text.secondary' }}>
                                 {toPokemonNumber(pokemon.id)}
                             </Typography>
