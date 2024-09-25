@@ -73,7 +73,17 @@ function getPokemonHiddenAbilityString(abilities: PokemonAbility[]): string {
     return "None"
 }
 
-async function getPokemonWeakness(types: PokemonType[]): Promise<string[]> {
+interface DamageRelations {
+    weaknesses: string[];
+    resistances: string[];
+    immunities: string[];
+}
+
+/**
+ * Gets the weaknesses, resistances, and immunities of a pokemons types. Returns them as a
+ * @param types The types to find damage statistics for
+ */
+async function getPokemonDamageRelations(types: PokemonType[]): Promise<DamageRelations> {
     const api = new PokemonClient();
     try {
         let resist: string[] = [];
@@ -101,15 +111,26 @@ async function getPokemonWeakness(types: PokemonType[]): Promise<string[]> {
             }
         }));
 
-        // Create a Set to filter out duplicates
-        return Array.from(new Set(
+        const immunities: Array<string> = Array.from(new Set(
+            immune
+        ));
+
+        const resistances: Array<string> = Array.from(new Set(
+            resist.filter((type: string) => {
+                return !weak.includes(type) && !immune.includes(type);
+            })
+        ));
+
+        const weaknesses: Array<string> = Array.from(new Set(
             weak.filter((type: string) => {
                 return !resist.includes(type) && !immune.includes(type);
             })
         ));
+
+        return {weaknesses: weaknesses, resistances: resistances, immunities: immunities}
     } catch (error) {
         console.error(error);
-        return [];
+        return {immunities: [], resistances: [], weaknesses: [],};
     }
 }
 
@@ -120,4 +141,6 @@ export {
     hectogramsToWeightString,
     getPokemonAbilitiesString,
     getPokemonHiddenAbilityString,
-    getPokemonWeakness};
+    getPokemonDamageRelations
+};
+export type { DamageRelations };
