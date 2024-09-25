@@ -18,7 +18,7 @@ const PokemonGrid = () => {
 
 
     /**
-     * Get the pokemon data from PokeAPI
+     * Get the pokemon data from PokeAPI to populate the pokemon card grid
      * Utilising lazy loading, so only fetches pokemon that will show up on the current page
      */
     React.useEffect(() => {
@@ -52,11 +52,22 @@ const PokemonGrid = () => {
      * Displays a message if no pokemon are found
      */
     const pokemon_rows = () => {
-        if (pokemon.length === 0) {
+        if (errorFlag) {
+            return (
+                <div style={{display: "grid", minWidth: "280px"}}>
+                        <Alert severity="error">
+                            <AlertTitle>
+                                Error
+                            </AlertTitle>
+                            {errorMessage}
+                        </Alert>
+                </div>
+            )
+        } else if (pokemon.length === 0) {
             return (
                 <Stack sx={{m: 8}}>
                     <Typography variant="h6" color="text.primary" sx={{margin: "8 8 0", fontSize: "35px"}}>
-                        No Pokemon found. Please ensure you are connected to the network and PokeAPI is not down.
+                        Loading...
                     </Typography>
                 </Stack>
             )
@@ -106,24 +117,15 @@ const PokemonGrid = () => {
 
     return (
         <Paper elevation={3} style={card}>
-            <Grid container spacing={3} justifyContent='center'>
-                <Grid>
-                    <Typography variant="h2" sx={{fontWeight: "bold"}} color="text.primary">
-                        Pokedex
-                    </Typography>
-                </Grid>
-            </Grid>
+            <Box display='flex' justifyContent='center'>
+                <Typography variant="h2" sx={{fontWeight: "bold"}} color="text.primary">
+                    Pokedex
+                </Typography>
+            </Box>
             <Divider sx={{marginBottom: 1, marginTop: 1}}/>
-            <div style={{display: "grid", minWidth: "280px"}}>
-                {errorFlag ?
-                    <Alert severity="error">
-                        <AlertTitle>Error</AlertTitle>
-                        {errorMessage}
-                    </Alert> : ""}
-                <Grid container spacing={3} sx={{justifyContent: "center"}}>
-                    {pokemon_rows()}
-                </Grid>
-            </div>
+            <Grid container spacing={3} sx={{justifyContent: "center"}}>
+                {pokemon_rows()}
+            </Grid>
             <Divider sx={{marginBottom: 1, marginTop: 1}}/>
             <Grid
                 display='flex'
