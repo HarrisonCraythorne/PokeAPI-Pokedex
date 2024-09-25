@@ -10,6 +10,8 @@ import {POKE_ID_RANGE} from "./constants/constants";
 
 function App() {
     const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
+    const [errorFlag, setErrorFlag] = React.useState(false);
+    const [errorMessage, setErrorMessage] = React.useState("");
 
     /**
      * Get the pokemon data from PokeAPI to populate the pokemon card grid. Grabs all pokemon and then the pokemon grid
@@ -20,16 +22,16 @@ function App() {
             const api = new PokemonClient();
 
             try {
-                if (pokemon.length < POKE_ID_RANGE.MAX) {
-                    const promises: Array<Promise<Pokemon>> = [];
-                    for (let i = POKE_ID_RANGE.MIN; i <= POKE_ID_RANGE.MAX; i++) {
-                        promises.push(api.getPokemonById(i));
-                    }
-                    // Wait for all the promises to resolve
-                    const responses = await Promise.all(promises);
-                    setPokemon(responses);
+                const promises: Array<Promise<Pokemon>> = [];
+                for (let i = POKE_ID_RANGE.MIN; i <= POKE_ID_RANGE.MAX; i++) {
+                    promises.push(api.getPokemonById(i));
                 }
+                // Wait for all the promises to resolve
+                const responses = await Promise.all(promises);
+                setPokemon(responses);
             } catch (error: any) {
+                setErrorFlag(false);
+                setErrorMessage('');
             }
         };
         getPokemon();
@@ -40,7 +42,9 @@ function App() {
         <Router>
           <div>
             <Routes>
-                <Route path="/pokedex/:pageNum" element={<PokemonGrid pokemon={pokemon}/>}/>
+                <Route path="/pokedex/:pageNum" element={<PokemonGrid pokemon={pokemon}
+                                                                      errorFlag={errorFlag}
+                                                                      errorMessage={errorMessage} />}/>
                 <Route path="/pokemon/:pokemonId" element={<PokemonDetailedView/>}/>
                 <Route path="*" element={<NotFound/>}/>
             </Routes>
