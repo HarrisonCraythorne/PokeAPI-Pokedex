@@ -10,16 +10,17 @@ import Grid from '@mui/material/Unstable_Grid2';
 import {Pokemon, PokemonClient} from 'pokenode-ts';
 import {
     decimetresToHeightString,
-    getPokemonAbilitiesString, getPokemonHiddenAbilityString, getPokemonWeakness,
+    getPokemonAbilitiesString, getPokemonHiddenAbilityString, getPokemonDamageRelations,
     hectogramsToWeightString,
     toPokemonNumber,
-    toTitleCase
+    toTitleCase, DamageRelations
 } from '../utils';
 import TypeChip from './type_chips/TypeChip';
 import {useParams} from 'react-router-dom';
 import NotFound from './NotFound';
 import CSS from 'csstype';
 import BackButton from './BackButton';
+import EmptyChip from "./type_chips/EmptyChip";
 
 const PokemonDetailedView = () => {
     const id = useParams().pokemonId;
@@ -27,6 +28,9 @@ const PokemonDetailedView = () => {
     const [errorMessage, setErrorMessage] = React.useState('');
     const [pokemon, setPokemon] = React.useState<Pokemon | null>(null);
     const [weaknesses, setWeaknesses] = React.useState<Array<string>>([]);
+    const [resistances, setResistances] = React.useState<Array<string>>([]);
+    const [immunities, setImmunities] = React.useState<Array<string>>([]);
+
 
     /**
      * Get the pokemon data from PokeAPI for the specific pokemon's page
@@ -42,7 +46,11 @@ const PokemonDetailedView = () => {
                     setPokemon(pokemon);
                     setErrorFlag(false);
                     setErrorMessage('');
-                    setWeaknesses(await getPokemonWeakness(pokemon.types));
+                    const damageRelations: DamageRelations = await getPokemonDamageRelations(pokemon.types)
+                    console.log(damageRelations)
+                    setWeaknesses(damageRelations.weaknesses);
+                    setResistances(damageRelations.resistances);
+                    setImmunities(damageRelations.immunities);
                 } catch (error: any) {
                     setErrorFlag(true);
                     setErrorMessage(error.toString());
@@ -67,10 +75,42 @@ const PokemonDetailedView = () => {
     }
 
     function getWeaknessChips() {
+        if (weaknesses.length === 0) {
+            return (
+                <Grid xs={1} key={'wgrid'} sx={{mb: 1}}>
+                    <EmptyChip key={'wchip'}/>
+                </Grid>);
+        } else {
+            return (
+                weaknesses.map((type: string, index: number) =>
+                    <Grid xs={1} key={'wgrid' + index} sx={{mb: 1}}>
+                        <TypeChip key={'weak' + index} pokemonType={type}/>
+                    </Grid>)
+            );
+        }
+    }
+
+    function getResistChips() {
+        if (resistances.length === 0) {
+            return (
+                <Grid xs={1} key={'rgrid'} sx={{mb: 1}}>
+                    <EmptyChip key={'rchip'}/>
+                </Grid>);
+        } else {
+            return (
+                resistances.map((type: string, index: number) =>
+                    <Grid xs={1} key={'rgrid' + index} sx={{mb: 1}}>
+                        <TypeChip key={'res' + index} pokemonType={type}/>
+                    </Grid>)
+            );
+        }
+    }
+
+    function getImmuneChips() {
         return (
-            weaknesses.map((type: string, index: number) =>
-                <Grid xs={1} key={'grid' + index} sx={{mb: 1}}>
-                    <TypeChip key={'chip' + index} pokemonType={type}/>
+            immunities.map((type: string, index: number) =>
+                <Grid xs={1} key={'igrid' + index} sx={{mb: 1}}>
+                    <TypeChip key={'imm' + index} pokemonType={type}/>
                 </Grid>)
         );
     }
@@ -234,6 +274,22 @@ const PokemonDetailedView = () => {
                                     // can be removed to always show two chips and have a blank second chips for monotype pokemon
                                     pokemon.types.at(1) && <TypeChip pokemonType={pokemon.types.at(1)} />}
                             </Box>
+                            { immunities.length > 0 &&
+                                <>
+                                <Typography variant='h6' sx={{mt: 1}}>
+                                    Immunities:
+                                </Typography>
+                                <Grid container columns={2} spacing={0} justifyContent='center' alignItems='center' sx={{width: '160px'}}>
+                                    {getImmuneChips()}
+                                </Grid>
+                                </>
+                            }
+                            <Typography variant='h6' sx={{mt: 1}}>
+                                Resistances:
+                            </Typography>
+                            <Grid container columns={2} spacing={0} justifyContent='center' alignItems='center' sx={{width: '160px'}}>
+                                {getResistChips()}
+                            </Grid>
                             <Typography variant='h6' sx={{mt: 1}}>
                                 Weaknesses:
                             </Typography>
