@@ -7,6 +7,7 @@ import PokemonGrid from "./components/PokemonGrid";
 import PokemonDetailedView from "./components/PokemonDetailedView";
 import {Pokemon, PokemonClient} from "pokenode-ts";
 import {POKE_ID_RANGE} from "./constants/constants";
+import LandingPage from "./components/LandingPage";
 
 function App() {
     const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
@@ -42,6 +43,7 @@ function App() {
         <Router>
           <div>
             <Routes>
+                <Route path="/" element={<LandingPage/>}/>
                 <Route path="/pokedex/:pageNum" element={<PokemonGrid pokemon={pokemon}
                                                                       errorFlag={errorFlag}
                                                                       errorMessage={errorMessage} />}/>
