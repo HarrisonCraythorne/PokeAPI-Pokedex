@@ -52,8 +52,8 @@ function getPokemonAbilitiesString(abilities: PokemonAbility[]): string {
         secondAbility = abilities.at(1)?.ability.name;
     }
     return (secondAbility ?
-        "Abilities: " + toTitleCase(firstAbility) + '/' + toTitleCase(secondAbility) :
-        "Ability: " + toTitleCase(firstAbility));
+        toTitleCase(firstAbility) + '/' + toTitleCase(secondAbility) :
+        toTitleCase(firstAbility));
 }
 
 
@@ -67,10 +67,10 @@ function getPokemonHiddenAbilityString(abilities: PokemonAbility[]): string {
     for (let i = 0; i < abilities.length; i++) {
         if (abilities.at(i)?.is_hidden) {
             const hiddenAbility: string = abilities.at(i)?.ability.name || '';
-            return "Hidden Ability: " + toTitleCase(hiddenAbility);
+            return toTitleCase(hiddenAbility);
         }
     }
-    return "Hidden Ability: None"
+    return "None"
 }
 
 export {
