@@ -94,6 +94,7 @@ const PokemonGrid = () => {
 
     /**
      * Handles page number updates
+     * @param _event Here as if removed function does not work correctly, but automatically handled by React
      * @param newPage The new page number to switch to. This param is automatically passed to this method by react.
      */
     const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
