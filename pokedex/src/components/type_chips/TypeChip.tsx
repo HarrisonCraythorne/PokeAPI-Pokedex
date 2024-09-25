@@ -21,12 +21,14 @@ import {PokemonType} from "pokenode-ts";
 import FairyChip from "./FairyChip";
 
 interface ITypeChipProps {
-    pokemonType: PokemonType | undefined;
+    pokemonType: PokemonType | string | undefined;
 }
 
 const TypeChip = (props: ITypeChipProps) => {
 
-    const type = props.pokemonType ? props.pokemonType.type.name : undefined;
+    const type = typeof props.pokemonType === 'string'
+        ? props.pokemonType
+        : props.pokemonType?.type.name;
 
     function chipFromType(type: string): any {
         switch (type.toLowerCase()) {
