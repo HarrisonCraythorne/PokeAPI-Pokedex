@@ -2,13 +2,15 @@ import React from 'react';
 import CSS from 'csstype';
 import {Alert, AlertTitle, Box, Divider, MenuItem, Pagination, Paper, Select, Stack, Typography} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import {Pokemon, PokemonClient} from "pokenode-ts";
+import {Pokemon} from "pokenode-ts";
 import PokemonCardObject from "./PokemonCardObject";
 import {POKE_ID_RANGE} from "../constants/constants";
 import {useNavigate, useParams} from "react-router-dom";
 
 interface PokemonGridProps {
     pokemon: Pokemon[];
+    errorFlag: boolean;
+    errorMessage: string;
 }
 
 const PokemonGrid = (props: PokemonGridProps) => {
@@ -16,26 +18,24 @@ const PokemonGrid = (props: PokemonGridProps) => {
     const navigate = useNavigate();
 
     // Error stats if PokeAPI call fails
-    const [errorFlag, setErrorFlag] = React.useState(false);
-    const [errorMessage, setErrorMessage] = React.useState("");
+    const errorFlag = props.errorFlag;
+    const errorMessage = props.errorMessage;
 
     // Info about pokemon list, and page data.
-    //const [pokemon, setPokemon] = React.useState<Array<Pokemon>>([]);
     const [currentPagePokemon, setCurrentPagePokemon] = React.useState<Array<Pokemon>>([]);
-    //const [pageNum, setPageNum] = React.useState(1);
     const [pageSize, setPageSize] = React.useState<number>(35);
-    // Options for number of pokemon per page
     const cardsPerPageOptions = [5, 10, 20, 35, 50, POKE_ID_RANGE.MAX];
-    const pokemon = props.pokemon;
+    // Options for number of pokemon per page
     const pageNum = parseInt(useParams().pageNum || '1');
+
+    // list of all pokemon
+    const pokemon = props.pokemon;
 
 
     React.useEffect(() => {
         const getPokemon = () => {
             const pagePokemon: Array<Pokemon> = pokemon.slice(((pageNum - 1) * pageSize), pageNum * pageSize);
             setCurrentPagePokemon(pagePokemon);
-            setErrorFlag(false);
-            setErrorMessage('');
         };
         getPokemon();
     }, [pokemon, pageNum, pageSize]);
@@ -96,9 +96,7 @@ const PokemonGrid = (props: PokemonGridProps) => {
 
 
     /**
-     * Handles pagination page size changing. Attempts to put user on a page that would contain the same/similar listings
-     * and previous page after the sizing. (e.g. if on page 4 with page size 5 (items 16-20), would put user on page 2
-     * if new page size is 10 (items 11-20). Due to rounding this may not always be entirely accurate.
+     * Handles pagination page size changing
      */
     const handleChangePageSize = (event: { target: { value: string; }; }) => {
         const newRowsPerPage = parseInt(event.target.value, 10)
