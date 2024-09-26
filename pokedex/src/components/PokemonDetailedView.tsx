@@ -4,7 +4,7 @@ import {
     Box,
     CardMedia, Divider, Paper,
     Stack,
-    Typography
+    Typography, useMediaQuery, useTheme
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import {Pokemon, PokemonClient} from 'pokenode-ts';
@@ -31,6 +31,10 @@ const PokemonDetailedView = () => {
     const [weaknesses, setWeaknesses] = React.useState<Array<string>>([]);
     const [resistances, setResistances] = React.useState<Array<string>>([]);
     const [immunities, setImmunities] = React.useState<Array<string>>([]);
+
+    // for finding screen size to better format for small screens
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
 
     /**
@@ -134,6 +138,42 @@ const PokemonDetailedView = () => {
         );
     }
 
+    /**
+     * Gets the header for the page, consisting of:
+     *  - Back Button
+     *  - Pokemon Name
+     *  - Blank section for formatting if needed
+     *  Formats wide for comp screens and tall for mobile
+     */
+    function getPageHeader() {
+        if (pokemon) {
+            return (
+                <Grid container spacing={1} columns={12}>
+                    <Grid md={3} sm={12} sx={{display: 'flex', width: '100%'}} alignItems='center'
+                          justifyContent='center'>
+                        <BackButton text={'Return to Pokedex'}/>
+                    </Grid>
+                    <Grid md={6} sm={12} sx={{display: 'flex', width: '100%'}} alignItems='center'
+                          justifyContent='center'>
+                        <Box display='flex' justifyContent='center'>
+                            <Typography variant={isSmallScreen ? 'h4' : 'h2'} noWrap>
+                                {toTitleCase(pokemon.name)}&nbsp;
+                            </Typography>
+                            <Typography variant={isSmallScreen ? 'h4' : 'h2'} sx={{color: 'text.secondary'}}>
+                                {toPokemonNumber(pokemon.id)}
+                            </Typography>
+                        </Box>
+                    </Grid>
+                    <Grid md={3} sm={0} sx={{display: 'flex'}} alignItems='center' justifyContent='center'>
+                        {/*Here to align the pokemon name and number centrally as otherwise the back button
+                           offsets them. Simply an empty block to take up space*/}
+                        &nbsp;
+                    </Grid>
+                </Grid>
+            );
+        }
+    }
+
     if (errorFlag) {
         return (
             <div style={{display: 'grid', minWidth: '280px'}}>
@@ -148,28 +188,9 @@ const PokemonDetailedView = () => {
     } else {
         return (
             <Paper elevation={3} style={card}>
-                <Grid container spacing={1} columns={12}>
-                    <Grid xs={3} sx={{display: 'flex'}} alignItems='center' justifyContent='center'>
-                        <BackButton text={'Return to Pokedex'}/>
-                    </Grid>
-                    <Grid xs={6} sx={{display: 'flex'}} alignItems='center' justifyContent='center'>
-                        <Box display='flex' justifyContent='center'>
-                            <Typography variant='h2' noWrap>
-                                {toTitleCase(pokemon.name)}&nbsp;
-                            </Typography>
-                            <Typography variant='h2' sx={{color: 'text.secondary'}}>
-                                {toPokemonNumber(pokemon.id)}
-                            </Typography>
-                        </Box>
-                    </Grid>
-                    <Grid xs={3} sx={{display: 'flex'}} alignItems='center' justifyContent='center'>
-                        {/*Here to align the pokemon name and number centrally as otherwise the back button
-                           offsets them. Simply an empty block to take up space*/}
-                        &nbsp;
-                    </Grid>
-                </Grid>
+                {getPageHeader()}
                 <Divider sx={{marginBottom: 1, marginTop: 1}}/>
-                <Stack direction='row' spacing={-4} alignItems='center'>
+                <Stack direction={isSmallScreen ? 'column' : 'row'} spacing={-4} alignItems='center'>
                     <CardMedia
                         component='img'
                         image={pokemon.sprites.front_default !== null ? pokemon.sprites.front_default : undefined}
@@ -180,7 +201,7 @@ const PokemonDetailedView = () => {
                             overflow: 'hidden',
                         }}
                     />
-                    <Stack direction='row' spacing={1} alignItems='center' justifyContent='space-evenly' sx={{width: '90%'}}>
+                    <Stack direction={isSmallScreen ? 'column' : 'row'} spacing={1} alignItems='center' justifyContent='space-evenly' sx={{width: '90%'}}>
                         <Stack spacing={0} sx={{width: '250px'}}>
                             <Box display='flex' justifyContent='space-between'>
                                 <Typography variant='h6' sx={{color: 'text.secondary'}}>
